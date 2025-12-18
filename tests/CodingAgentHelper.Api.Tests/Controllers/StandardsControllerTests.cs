@@ -12,6 +12,16 @@ public class StandardsControllerTests
 {
     private readonly ApiTestFixture _fixture;
 
+    /// <summary>
+    /// JSON serializer options matching ASP.NET Core defaults
+    /// </summary>
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = false
+    };
+
     public StandardsControllerTests(ApiTestFixture fixture)
     {
         _fixture = fixture;
@@ -26,7 +36,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardListResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardListResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.NotNull(result.Items);
     }
@@ -43,16 +53,18 @@ public class StandardsControllerTests
         };
 
         var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var createdContent = await createResponse.Content.ReadAsStringAsync();
-        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent);
+        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent, JsonOptions);
+        Assert.NotNull(createdStandard);
 
         // Act
-        var response = await _fixture.Client.GetAsync($"/api/standards/{createdStandard!.Id}");
+        var response = await _fixture.Client.GetAsync($"/api/standards/{createdStandard.Id}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.Equal(createdStandard.Id, result!.Id);
         Assert.Equal("Test Standard", result.Title);
@@ -85,7 +97,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.Equal("New Standard", result!.Title);
         Assert.Equal("New Description", result.Description);
@@ -121,8 +133,9 @@ public class StandardsControllerTests
             Category = "Testing"
         };
         var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var createdContent = await createResponse.Content.ReadAsStringAsync();
-        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent)!;
+        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent, JsonOptions)!;
 
         var updateRequest = new UpdateStandardRequest
         {
@@ -135,7 +148,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.Equal("Inactive", result!.Status);
     }
@@ -151,8 +164,9 @@ public class StandardsControllerTests
             Category = "Testing"
         };
         var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var createdContent = await createResponse.Content.ReadAsStringAsync();
-        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent)!;
+        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent, JsonOptions)!;
 
         // Act
         var response = await _fixture.Client.DeleteAsync($"/api/standards/{createdStandard.Id}");
@@ -175,7 +189,8 @@ public class StandardsControllerTests
             Description = "Always use async patterns for I/O",
             Category = "Performance"
         };
-        await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
 
         // Act
         var response = await _fixture.Client.GetAsync("/api/standards/search?query=async");
@@ -183,7 +198,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardListResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardListResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.True(result!.TotalCount > 0);
     }
@@ -199,8 +214,9 @@ public class StandardsControllerTests
             Category = "Testing"
         };
         var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var createdContent = await createResponse.Content.ReadAsStringAsync();
-        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent)!;
+        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent, JsonOptions)!;
 
         var tagRequest = new { tag = "important" };
 
@@ -210,7 +226,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.Contains("important", result!.Tags);
     }
@@ -227,8 +243,9 @@ public class StandardsControllerTests
             Tags = new List<string> { "important", "urgent" }
         };
         var createResponse = await _fixture.Client.PostAsJsonAsync("/api/standards", createRequest);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
         var createdContent = await createResponse.Content.ReadAsStringAsync();
-        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent)!;
+        var createdStandard = JsonSerializer.Deserialize<StandardResponse>(createdContent, JsonOptions)!;
 
         // Act
         var response = await _fixture.Client.DeleteAsync($"/api/standards/{createdStandard.Id}/tags/important");
@@ -236,7 +253,7 @@ public class StandardsControllerTests
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<StandardResponse>(content);
+        var result = JsonSerializer.Deserialize<StandardResponse>(content, JsonOptions);
         Assert.NotNull(result);
         Assert.DoesNotContain("important", result!.Tags);
         Assert.Contains("urgent", result.Tags);
