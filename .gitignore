@@ -1,0 +1,54 @@
+# Ignore build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.nupkg
+
+# Ignore IDE files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.filters
+*.vcxproj.user
+*.sln.iml
+.idea/
+*.swp
+*.swo
+
+# Ignore local configuration
+appsettings.local.json
+appsettings.Development.json
+launchSettings.json
+
+# Ignore package manager files
+packages/
+.nuget/
+
+# Ignore test results
+TestResults/
+*.trx
+
+# Ignore Chroma data
+data/
+
+# Ignore temporary files
+tmp/
+*.tmp
+tmp_*.ps1
+
+# Ignore OS files
+Thumbs.db
+.DS_Store
+
+# Ignore SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+# Ignore temporary build files
+*.log
