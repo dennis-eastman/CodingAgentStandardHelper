@@ -7,9 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database
-builder.Services.AddDbContext<CodingAgentDbContext>(options =>
-    options.UseSqlite("Data Source=./data/cah_standards.db"));
+// Database - use appropriate provider based on environment
+if (builder.Environment.IsEnvironment("Test"))
+{
+    // Use in-memory for testing
+    builder.Services.AddDbContext<CodingAgentDbContext>(options =>
+        options.UseInMemoryDatabase("test-db"));
+}
+else
+{
+    // Use SQLite for production/development
+    builder.Services.AddDbContext<CodingAgentDbContext>(options =>
+        options.UseSqlite("Data Source=./data/cah_standards.db"));
+}
 
 // Services
 builder.Services.AddScoped<IStandardRepository, StandardRepository>();
@@ -63,11 +73,14 @@ if (app.Environment.IsDevelopment())
 // Global exception handling
 app.UseExceptionHandling();
 
-// Create database and migrations
-using (var scope = app.Services.CreateScope())
+// Create database and migrations (skip in Test environment)
+if (!app.Environment.IsEnvironment("Test"))
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CodingAgentDbContext>();
-    dbContext.Database.EnsureCreated();
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<CodingAgentDbContext>();
+        dbContext.Database.EnsureCreated();
+    }
 }
 
 app.UseHttpsRedirection();

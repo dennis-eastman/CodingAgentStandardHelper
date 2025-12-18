@@ -1,6 +1,7 @@
 namespace CodingAgentHelper.Api.Tests.Infrastructure;
 
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using CodingAgentHelper.Core.Infrastructure.Data;
@@ -19,36 +20,20 @@ public class ApiTestFixture : IAsyncLifetime
         _factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(services =>
-                {
-                    // Remove all DbContext descriptors
-                    var descriptorsToRemove = services
-                        .Where(d => d.ServiceType == typeof(DbContextOptions<CodingAgentDbContext>) ||
-                                   (d.ServiceType == typeof(DbContextOptions) && 
-                                    d.ImplementationType?.Name.Contains("CodingAgentDbContext") == true))
-                        .ToList();
-
-                    foreach (var descriptor in descriptorsToRemove)
-                    {
-                        services.Remove(descriptor);
-                    }
-
-                    // Add in-memory database for testing
-                    services.AddDbContext<CodingAgentDbContext>(options =>
-                        options.UseInMemoryDatabase(Guid.NewGuid().ToString()),
-                        ServiceLifetime.Transient);
-                });
+                // Set test environment - Program.cs will use InMemory database for Test environment
+                builder.UseEnvironment("Test");
             });
 
-        try
+        Client = _factory.CreateClient();
+        
+        // Initialize database
+        using (var scope = _factory.Services.CreateScope())
         {
-            Client = _factory.CreateClient();
-            await Task.CompletedTask;
+            var dbContext = scope.ServiceProvider.GetRequiredService<CodingAgentDbContext>();
+            await dbContext.Database.EnsureCreatedAsync();
         }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Failed to create test client", ex);
-        }
+
+        await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
