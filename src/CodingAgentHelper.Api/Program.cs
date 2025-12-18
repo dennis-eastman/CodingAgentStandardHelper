@@ -2,6 +2,7 @@ using CodingAgentHelper.Core.Application.Services;
 using CodingAgentHelper.Core.Domain.Repositories;
 using CodingAgentHelper.Core.Infrastructure.Data;
 using CodingAgentHelper.Core.Infrastructure.VectorStore;
+using CodingAgentHelper.Api.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,9 +27,21 @@ builder.Services.AddSingleton(chromaConfig);
 builder.Services.AddSingleton<IChromaClient>(sp => new MockChromaClient(chromaConfig, sp.GetRequiredService<ILogger<MockChromaClient>>()));
 builder.Services.AddSingleton<IEmbeddingService, MockEmbeddingService>();
 
+// Add Controllers
+builder.Services.AddControllers();
+
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Enable XML documentation for Swagger
+    var xmlFile = "CodingAgentHelper.Api.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
 
 // Add Logging
 builder.Logging.ClearProviders();
@@ -36,9 +49,19 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-// Configure Swagger
-app.UseSwagger();
-app.UseSwaggerUI();
+// Configure middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "CodingAgentHelper API v1");
+        options.RoutePrefix = string.Empty; // Swagger at root
+    });
+}
+
+// Global exception handling
+app.UseExceptionHandling();
 
 // Create database and migrations
 using (var scope = app.Services.CreateScope())
@@ -48,5 +71,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 
 app.Run();
+
+// Make Program accessible for WebApplicationFactory in tests
+public partial class Program { }
