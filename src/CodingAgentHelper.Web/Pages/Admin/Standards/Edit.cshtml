@@ -1,0 +1,160 @@
+@page "{id}"
+@model CodingAgentHelper.Web.Pages.Admin.Standards.EditModel
+@{
+    ViewData["Title"] = "Edit Standard";
+    ViewData["PageName"] = "Edit Standard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h2">
+                <i class="fas fa-pencil-alt"></i> Edit Standard: @Model.Standard.Title
+            </h1>
+            <small class="text-muted">Update status, priority, and tags</small>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" id="editForm" class="needs-validation" novalidate>
+                        <!-- Read-only Fields -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">Title (Read-Only)</label>
+                                        <input type="text" class="form-control" value="@Model.Standard.Title" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Category (Read-Only)</label>
+                                        <input type="text" class="form-control" value="@Model.Standard.Category" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Created</label>
+                                        <input type="text" class="form-control" value="@Model.Standard.CreatedAt.ToString("MMM dd, yyyy")" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Editable Fields -->
+                        <h5 class="mb-3">Update Fields</h5>
+
+                        <!-- Status Field -->
+                        <div class="mb-3">
+                            <label for="Status" class="form-label fw-bold">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="Status" asp-for="Input.Status" required>
+                                <option value="0" selected>Active</option>
+                                <option value="1">Inactive</option>
+                                <option value="2">Archived</option>
+                                <option value="3">Deprecated</option>
+                            </select>
+                            <small class="text-muted">Current: <strong>@Model.Standard.Status</strong></small>
+                        </div>
+
+                        <!-- Priority Field -->
+                        <div class="mb-3">
+                            <label for="Priority" class="form-label fw-bold">
+                                Priority <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="Priority" asp-for="Input.Priority" required>
+                                <option value="0">Low</option>
+                                <option value="1">Medium</option>
+                                <option value="2">High</option>
+                                <option value="3">Critical</option>
+                            </select>
+                            <small class="text-muted">Current: <strong>@Model.Standard.Priority</strong></small>
+                        </div>
+
+                        <!-- Tags Field -->
+                        <div class="mb-3">
+                            <label for="Tags" class="form-label fw-bold">
+                                Tags
+                            </label>
+                            <textarea class="form-control" id="Tags" asp-for="Input.Tags" rows="2" placeholder="Comma-separated tags"></textarea>
+                            <small class="text-muted">Current tags: @(Model.Standard.Tags?.Count > 0 ? string.Join(", ", Model.Standard.Tags) : "No tags")</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="/Admin/Standards/Details/@Model.Standard.Id" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+
+                        <!-- Error Message -->
+                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        {
+                            <div class="alert alert-danger mt-3" role="alert">
+                                <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+                            </div>
+                        }
+
+                        <!-- Success Message -->
+                        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                        {
+                            <div class="alert alert-success mt-3" role="alert">
+                                <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-md-4">
+            <div class="card bg-light sticky-top" style="top: 20px;">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="fas fa-lightbulb"></i> Status Guide
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">Active</h6>
+                    <p class="small mb-3">Standard is current and should be followed by all teams.</p>
+
+                    <h6 class="card-title">Inactive</h6>
+                    <p class="small mb-3">Standard is temporarily disabled but may be reactivated.</p>
+
+                    <h6 class="card-title">Archived</h6>
+                    <p class="small mb-3">Standard is no longer used and kept for historical reference.</p>
+
+                    <h6 class="card-title">Deprecated</h6>
+                    <p class="small">Standard is being phased out; teams should migrate to the replacement.</p>
+
+                    <hr />
+
+                    <p class="small"><strong>Tip:</strong> You can only change Status, Priority, and Tags here. To modify Title, Description, or Category, delete and create a new standard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

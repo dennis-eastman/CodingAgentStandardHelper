@@ -1,0 +1,139 @@
+@page
+@model CodingAgentHelper.Web.Pages.Admin.Standards.CreateModel
+@{
+    ViewData["Title"] = "Create Standard";
+    ViewData["PageName"] = "Create Standard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h2">
+                <i class="fas fa-plus-circle"></i> Create New Standard
+            </h1>
+            <small class="text-muted">Add a new coding standard to the repository</small>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" id="createForm" class="needs-validation" novalidate>
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            <label for="Title" class="form-label fw-bold">
+                                Title <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="Title" asp-for="Input.Title" 
+                                   placeholder="e.g., Use async/await patterns" required>
+                            <span class="invalid-feedback" asp-validation-for="Input.Title"></span>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mb-3">
+                            <label for="Description" class="form-label fw-bold">
+                                Description <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="Description" asp-for="Input.Description" 
+                                      rows="4" placeholder="Detailed description of the standard..." required></textarea>
+                            <span class="invalid-feedback" asp-validation-for="Input.Description"></span>
+                            <small class="text-muted">Explain why this standard matters and when to use it</small>
+                        </div>
+
+                        <!-- Category Field -->
+                        <div class="mb-3">
+                            <label for="Category" class="form-label fw-bold">
+                                Category <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="Category" asp-for="Input.Category" 
+                                   placeholder="e.g., Performance, Security, Testing" required>
+                            <span class="invalid-feedback" asp-validation-for="Input.Category"></span>
+                            <small class="text-muted">Categorize the standard for easier discovery</small>
+                        </div>
+
+                        <!-- Priority Field -->
+                        <div class="mb-3">
+                            <label for="Priority" class="form-label fw-bold">
+                                Priority <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="Priority" asp-for="Input.Priority" required>
+                                <option value="" selected disabled>Select priority level...</option>
+                                <option value="0">Low</option>
+                                <option value="1">Medium</option>
+                                <option value="2">High</option>
+                                <option value="3">Critical</option>
+                            </select>
+                            <span class="invalid-feedback" asp-validation-for="Input.Priority"></span>
+                        </div>
+
+                        <!-- Tags Field -->
+                        <div class="mb-3">
+                            <label for="Tags" class="form-label fw-bold">
+                                Tags (Optional)
+                            </label>
+                            <input type="text" class="form-control" id="Tags" asp-for="Input.Tags" 
+                                   placeholder="Comma-separated tags (e.g., async, performance, best-practice)">
+                            <small class="text-muted">Enter tags separated by commas for easier searching</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Standard
+                            </button>
+                            <a href="/Admin/Standards" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="fas fa-lightbulb"></i> Tips
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">Standard Title</h6>
+                    <p class="small mb-3">Be specific and concise. Use action verbs like "Use", "Implement", "Follow".</p>
+
+                    <h6 class="card-title">Priority Levels</h6>
+                    <ul class="small">
+                        <li><strong>Critical:</strong> Must follow always</li>
+                        <li><strong>High:</strong> Should follow in most cases</li>
+                        <li><strong>Medium:</strong> Recommended for new code</li>
+                        <li><strong>Low:</strong> Nice to have guidelines</li>
+                    </ul>
+
+                    <h6 class="card-title">Tags</h6>
+                    <p class="small">Add relevant tags to help team members discover related standards.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Bootstrap form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.querySelectorAll('.needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+}

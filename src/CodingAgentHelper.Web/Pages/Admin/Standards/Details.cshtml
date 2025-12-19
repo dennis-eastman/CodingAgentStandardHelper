@@ -1,0 +1,140 @@
+@page "{id}"
+@model CodingAgentHelper.Web.Pages.Admin.Standards.DetailsModel
+@{
+    ViewData["Title"] = "Standard Details";
+    ViewData["PageName"] = "Standard Details";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2">
+                <i class="fas fa-file-alt"></i> @Model.Standard.Title
+            </h1>
+            <small class="text-muted">Created: @Model.Standard.CreatedAt.ToString("MMM dd, yyyy")</small>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/Admin/Standards/Edit/@Model.Standard.Id" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="/Admin/Standards" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>@Model.Standard.Description</p>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Category:</strong>
+                            <br />
+                            <span class="badge bg-info">@Model.Standard.Category</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Status:</strong>
+                            <br />
+                            @{
+                                var statusClass = Model.Standard.Status switch
+                                {
+                                    "Active" => "bg-success",
+                                    "Inactive" => "bg-warning",
+                                    "Archived" => "bg-secondary",
+                                    "Deprecated" => "bg-danger",
+                                    _ => "bg-light"
+                                };
+                            }
+                            <span class="badge @statusClass">@Model.Standard.Status</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Priority:</strong>
+                            <br />
+                            @{
+                                var priorityClass = Model.Standard.Priority switch
+                                {
+                                    "Low" => "bg-info",
+                                    "Medium" => "bg-warning",
+                                    "High" => "bg-danger",
+                                    "Critical" => "bg-dark",
+                                    _ => "bg-light"
+                                };
+                            }
+                            <span class="badge @priorityClass">@Model.Standard.Priority</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Last Updated:</strong>
+                            <br />
+                            <small>@Model.Standard.UpdatedAt.ToString("MMM dd, yyyy h:mm tt")</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Standard.Tags?.Count > 0)
+            {
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Tags</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var tag in Model.Standard.Tags)
+                        {
+                            <span class="badge bg-secondary me-2 mb-2">@tag</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-md-4">
+            <div class="card bg-light sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="fas fa-info-circle"></i> Information
+                </div>
+                <div class="card-body">
+                    <p class="small"><strong>ID:</strong></p>
+                    <code class="small">@Model.Standard.Id</code>
+
+                    <hr />
+
+                    <p class="small"><strong>Created:</strong></p>
+                    <small>@Model.Standard.CreatedAt.ToString("g")</small>
+
+                    <hr />
+
+                    <p class="small"><strong>Modified:</strong></p>
+                    <small>@Model.Standard.UpdatedAt.ToString("g")</small>
+
+                    <hr />
+
+                    <div class="d-grid gap-2">
+                        <a href="/Admin/Standards/Edit/@Model.Standard.Id" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Edit Standard
+                        </a>
+                        <a href="/Admin/Standards/Delete/@Model.Standard.Id" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
